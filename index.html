@@ -196,17 +196,6 @@
             transform: translateY(-2px);
         }
 
-        .completed-btn:active {
-            transform: translateY(0);
-        }
-
-        .completed-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            color: #ffffff;
-        }
-
         .warning-box {
             background: #fff3cd;
             border: 2px solid #ffc107;
@@ -244,72 +233,6 @@
             60% { transform: translateY(-8px); }
         }
 
-        .app-store-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 25px 0;
-            flex-wrap: wrap;
-        }
-
-        .app-store-btn {
-            display: inline-flex;
-            align-items: center;
-            background: #000000;
-            color: #ffffff;
-            padding: 15px 25px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            border: 2px solid #000000;
-            transition: all 0.3s ease;
-            font-size: 1.1em;
-            min-width: 160px;
-            justify-content: center;
-        }
-
-        .app-store-btn:hover {
-            background: #ffffff;
-            color: #000000;
-            text-decoration: none;
-            transform: translateY(-2px);
-        }
-
-        .app-store-btn .icon {
-            margin-right: 8px;
-            font-size: 1.2em;
-        }
-
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .typing-dots {
-            display: flex;
-            margin-left: 15px;
-        }
-
-        .typing-dots span {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #000000;
-            margin: 0 3px;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1.2); opacity: 1; }
-        }
-
         .app-icon {
             max-width: 300px;
             height: auto;
@@ -340,7 +263,6 @@
             font-family: 'Courier New', monospace;
             font-size: 1.2em;
             font-weight: 700;
-            position: relative;
         }
 
         .copy-btn {
@@ -354,28 +276,6 @@
             cursor: pointer;
             margin-top: 10px;
             transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background: #333333;
-        }
-
-        .copy-btn:active {
-            background: #000000;
-            transform: scale(0.95);
-        }
-
-        .image-fallback {
-            margin: 15px 0;
-        }
-
-        .image-loading {
-            border: 2px dashed #ccc;
-            padding: 30px;
-            text-align: center;
-            border-radius: 12px;
-            background: #f8f9fa;
-            color: #666;
         }
 
         /* スマートフォン対応 */
@@ -404,37 +304,6 @@
                 padding: 15px;
                 margin-bottom: 20px;
             }
-
-            .task-steps li {
-                padding: 12px 0;
-                font-size: 0.95em;
-            }
-
-            .step-number {
-                width: 25px;
-                height: 25px;
-                font-size: 0.8em;
-            }
-
-            .app-store-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .app-store-btn {
-                width: 100%;
-                max-width: 250px;
-                text-align: center;
-            }
-
-            .url-box {
-                font-size: 1.1em;
-                padding: 15px;
-            }
-        }
-
-        .hidden {
-            display: none;
         }
     </style>
 </head>
@@ -450,7 +319,7 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
             <div class="step-counter">
-                ステップ <span id="currentStep">1</span> / <span id="totalSteps">4</span>
+                ステップ <span id="currentStep">1</span> / <span id="totalSteps">5</span>
             </div>
         </div>
 
@@ -460,23 +329,21 @@
     </div>
 
     <script>
-        // 画像URL（修正済み）
+        // 画像URL
         const imageUrls = {
             appIcon: "./images/hrmos-app-icon.png",
             loginScreen: "./images/login-screen.png"
         };
 
-        // 画像表示機能（中央配置修正）
-        function createImageElement(imageUrl, altText, fallbackText, iconEmoji = "📱") {
-            console.log(`画像読み込み試行: ${imageUrl}`);
-            
+        // 画像表示機能
+        function createImageElement(imageUrl, altText, fallbackText, iconEmoji) {
             return `
                 <div style="text-align: center; margin: 20px 0;">
                     <img src="${imageUrl}" 
                          alt="${altText}" 
                          class="screenshot-image" 
-                         onload="console.log('画像読み込み成功: ${imageUrl}'); this.style.display='block'; this.nextElementSibling.style.display='none';"
-                         onerror="console.log('画像読み込み失敗: ${imageUrl}'); this.style.display='none'; this.nextElementSibling.style.display='block';">
+                         onload="this.style.display='block'; this.nextElementSibling.style.display='none';"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     
                     <div style="display: none; border: 3px solid #000000; padding: 30px; text-align: center; border-radius: 15px; background: #f8f9fa;">
                         <div style="font-size: 3em; margin-bottom: 15px;">${iconEmoji}</div>
@@ -489,19 +356,18 @@
             `;
         }
 
-        // ステップ定義（4ステップに変更）
+        // ステップ定義
         const steps = [
             {
                 title: "📱 HRMOS勤怠管理アプリをダウンロード",
                 message: "まずはスマートフォンにHRMOS勤怠管理アプリをダウンロードしましょう。",
                 tasks: [
-                    "スマートフォンでアプリストアを開く",
-                    "下記のリンクから直接アプリにアクセス",
-                    "「インストール」または「入手」ボタンをタップ",
+                    "「App Store」または「Google Play」を開く",
+                    "検索欄で「HRMOS 勤怠」で検索",
+                    "該当アプリを見つけてダウンロード", 
                     "ダウンロードが完了するまで待つ"
                 ],
                 info: "💡 アプリは無料でダウンロードできます。WiFi環境でのダウンロードを推奨します。",
-                appStores: true,
                 showAppIcon: true
             },
             {
@@ -509,7 +375,7 @@
                 message: "アプリをダウンロードできましたね！次はログインしましょう。",
                 tasks: [
                     "ホーム画面からHRMOS勤怠管理アプリをタップ",
-                    "「会社URL」の欄に下記URLを貼り付けし「次へ」をタップ",
+                    "「会社URL」の欄に上記URLを貼り付けし「次へ」をタップ",
                     "会社から配布されたIDとパスワードを入力",
                     "「ログイン」をタップして完了"
                 ],
@@ -522,11 +388,24 @@
                 message: "ログインできました！日次勤怠データを確認してみましょう。",
                 tasks: [
                     "ホーム画面から「日次勤怠」をタップ",
-                    "確認したい日付を選択", 
+                    "確認したい日付を選択",
                     "出勤時間、退勤時間、休憩時間が正しく記録されているか確認",
                     "異常や修正が必要な箇所をメモする"
                 ],
                 info: "💡 打刻漏れや時間のずれがないか、毎日確認する習慣をつけましょう。"
+            },
+            {
+                title: "📞 修正点をLINEWORKSで報告",
+                message: "勤怠データに修正が必要な場合は、LINEWORKSで報告しましょう。",
+                tasks: [
+                    "修正が必要な項目を具体的にメモする",
+                    "LINEWORKSアプリを開く",
+                    "管理者またはHRMOS担当者にメッセージを送る",
+                    "「日付・修正内容・理由」を明確に記載して送信",
+                    "対応完了の返信を待つ"
+                ],
+                info: "💡 修正依頼は具体的に記載することで、スムーズに対応してもらえます。",
+                reportExample: "【修正依頼例】\n7月15日の退勤時間を18:30→18:00に修正お願いします。\n理由：残業なしのため実際は18:00に退勤しました。"
             },
             {
                 title: "🎉 導入完了",
@@ -550,23 +429,6 @@
             document.getElementById('totalSteps').textContent = totalSteps;
         }
 
-        function showTypingIndicator() {
-            const chatContainer = document.getElementById('chatContainer');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'typing-indicator';
-            typingDiv.innerHTML = `
-                🤖 AIが説明を準備中
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            `;
-            chatContainer.appendChild(typingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            return typingDiv;
-        }
-
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
                 const btn = event.target;
@@ -586,116 +448,103 @@
             const step = steps[stepIndex];
             const chatContainer = document.getElementById('chatContainer');
             
-            // タイピング表示
-            const typingIndicator = showTypingIndicator();
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai-message';
             
-            setTimeout(() => {
-                // タイピング表示を削除
-                typingIndicator.remove();
-                
-                // メッセージ表示
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message ai-message';
-                
-                let appStoreHtml = '';
-                if (step.appStores) {
-                    appStoreHtml = `
-                        <div class="app-store-buttons">
-                            <a href="https://apps.apple.com/jp/app/hrmos%E5%8B%A4%E6%80%A0-%E5%8B%A4%E6%80%A0%E3%82%A2%E3%83%97%E3%83%AA/id1239263735" target="_blank" class="app-store-btn">
-                                <span class="icon">🍎</span>iPhoneの方はこちら
-                            </a>
-                            <a href="https://play.google.com/store/apps/details?id=co.ieyasu.ieyasu&hl=ja" target="_blank" class="app-store-btn">
-                                <span class="icon">🤖</span>Androidの方はこちら
-                            </a>
-                        </div>
-                    `;
-                }
+            let appIconHtml = '';
+            if (step.showAppIcon) {
+                appIconHtml = createImageElement(
+                    imageUrls.appIcon,
+                    "HRMOSアプリのアイコン", 
+                    "HRMOSアプリのアイコン",
+                    "📱"
+                );
+            }
 
-                let appIconHtml = '';
-                if (step.showAppIcon) {
-                    appIconHtml = createImageElement(
-                        imageUrls.appIcon,
-                        "HRMOSアプリのアイコン", 
-                        "HRMOSアプリのアイコン",
-                        "📱"
-                    );
-                }
-
-                let companyUrlHtml = '';
-                if (step.companyUrl) {
-                    companyUrlHtml = `
-                        <div class="url-box">
-                            <strong>📋 会社URL</strong><br><br>
-                            <div style="font-size: 1.3em; color: #007bff; margin: 10px 0;">${step.companyUrl}</div>
-                            <button class="copy-btn" onclick="copyToClipboard('${step.companyUrl}')">
-                                📋 URLをコピー
-                            </button>
-                        </div>
-                    `;
-                }
-
-                let loginScreenHtml = '';
-                if (step.showLoginScreen) {
-                    loginScreenHtml = createImageElement(
-                        imageUrls.loginScreen,
-                        "ログイン画面の例",
-                        "ログイン画面",
-                        "🔐"
-                    );
-                }
-                
-                if (step.success) {
-                    messageDiv.innerHTML = `
-                        <div class="ai-avatar">🤖</div>
-                        <div class="success-animation">
-                            <div class="success-icon">🎉</div>
-                            <h2 style="color: #000000; margin: 20px 0;">完了しました！</h2>
-                            <p style="color: #000000; font-size: 1.1em; line-height: 1.8;">
-                                HRMOS勤怠管理アプリの導入が完了しました！<br><br>
-                                これで日々の勤怠管理がスムーズにできるようになりますね。<br><br>
-                                困ったことがあればいつでもLINEWORKSで質問してください。
-                            </p>
-                            <div style="margin-top: 30px; padding: 20px; background: #d4edda; border: 2px solid #28a745; border-radius: 10px;">
-                                <strong style="color: #155724;">📋 今後の流れ：</strong><br><br>
-                                <ul style="color: #155724; text-align: left; margin: 10px 0; padding-left: 20px;">
-                                    <li>毎日アプリで勤怠データを確認</li>
-                                    <li>修正があればLINEWORKSで報告</li>
-                                    <li>不明点は遠慮なく質問</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    messageDiv.innerHTML = `
-                        <div class="ai-avatar">🤖</div>
-                        <div class="task-title">
-                            <span class="task-icon">${step.title.split(' ')[0]}</span>
-                            ${step.title.split(' ').slice(1).join(' ')}
-                        </div>
-                        <p style="color: #000000; margin-bottom: 15px; font-size: 1.05em;">${step.message}</p>
-                        ${step.warning ? `<div class="warning-box">${step.warning}</div>` : ''}
-                        ${step.info ? `<div class="info-box">${step.info}</div>` : ''}
-                        ${appIconHtml}
-                        ${companyUrlHtml}
-                        <ul class="task-steps">
-                            ${step.tasks.map((task, index) => 
-                                `<li>
-                                    <span class="step-number">${index + 1}</span>
-                                    <span class="step-text">${task}</span>
-                                </li>`
-                            ).join('')}
-                        </ul>
-                        ${loginScreenHtml}
-                        ${appStoreHtml}
-                        <button class="completed-btn" onclick="nextStep()">
-                            ✅ このステップを完了しました
+            let companyUrlHtml = '';
+            if (step.companyUrl) {
+                companyUrlHtml = `
+                    <div class="url-box">
+                        <strong>📋 会社URL</strong><br><br>
+                        <div style="font-size: 1.3em; color: #007bff; margin: 10px 0;">${step.companyUrl}</div>
+                        <button class="copy-btn" onclick="copyToClipboard('${step.companyUrl}')">
+                            📋 URLをコピー
                         </button>
-                    `;
-                }
-                
-                chatContainer.appendChild(messageDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 1200);
+                    </div>
+                `;
+            }
+
+            let loginScreenHtml = '';
+            if (step.showLoginScreen) {
+                loginScreenHtml = createImageElement(
+                    imageUrls.loginScreen,
+                    "ログイン画面の例",
+                    "ログイン画面",
+                    "🔐"
+                );
+            }
+
+            let reportExampleHtml = '';
+            if (step.reportExample) {
+                reportExampleHtml = `
+                    <div class="info-box">
+                        <strong>📝 報告例：</strong><br><br>
+                        <pre style="font-family: inherit; white-space: pre-wrap; margin: 0;">${step.reportExample}</pre>
+                    </div>
+                `;
+            }
+            
+            if (step.success) {
+                messageDiv.innerHTML = `
+                    <div class="ai-avatar">🤖</div>
+                    <div class="success-animation">
+                        <div class="success-icon">🎉</div>
+                        <h2 style="color: #000000; margin: 20px 0;">完了しました！</h2>
+                        <p style="color: #000000; font-size: 1.1em; line-height: 1.8;">
+                            HRMOS勤怠管理アプリの導入が完了しました！<br><br>
+                            これで日々の勤怠管理がスムーズにできるようになりますね。<br><br>
+                            困ったことがあればいつでもLINEWORKSで質問してください。
+                        </p>
+                        <div style="margin-top: 30px; padding: 20px; background: #d4edda; border: 2px solid #28a745; border-radius: 10px;">
+                            <strong style="color: #155724;">📋 今後の流れ：</strong><br><br>
+                            <ul style="color: #155724; text-align: left; margin: 10px 0; padding-left: 20px;">
+                                <li>毎日アプリで勤怠データを確認</li>
+                                <li>修正があればLINEWORKSで報告</li>
+                                <li>不明点は遠慮なく質問</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="ai-avatar">🤖</div>
+                    <div class="task-title">
+                        <span class="task-icon">${step.title.split(' ')[0]}</span>
+                        ${step.title.split(' ').slice(1).join(' ')}
+                    </div>
+                    <p style="color: #000000; margin-bottom: 15px; font-size: 1.05em;">${step.message}</p>
+                    ${step.warning ? `<div class="warning-box">${step.warning}</div>` : ''}
+                    ${step.info ? `<div class="info-box">${step.info}</div>` : ''}
+                    ${appIconHtml}
+                    ${companyUrlHtml}
+                    <ul class="task-steps">
+                        ${step.tasks.map((task, index) => 
+                            `<li>
+                                <span class="step-number">${index + 1}</span>
+                                <span class="step-text">${task}</span>
+                            </li>`
+                        ).join('')}
+                    </ul>
+                    ${loginScreenHtml}
+                    ${reportExampleHtml}
+                    <button class="completed-btn" onclick="nextStep()">
+                        ✅ このステップを完了しました
+                    </button>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function nextStep() {
@@ -714,9 +563,6 @@
             updateProgress();
             displayStep(0);
         });
-
-        // スマートフォンのタッチ操作改善
-        document.addEventListener('touchstart', function() {}, { passive: true });
     </script>
 </body>
 </html>
