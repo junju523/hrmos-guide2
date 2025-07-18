@@ -200,6 +200,13 @@
             transform: translateY(0);
         }
 
+        .completed-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            color: #ffffff;
+        }
+
         .warning-box {
             background: #fff3cd;
             border: 2px solid #ffc107;
@@ -293,13 +300,22 @@
             40% { transform: scale(1.2); opacity: 1; }
         }
 
-        .app-screenshot {
+        .app-icon {
+            max-width: 300px;
+            height: auto;
+            border-radius: 12px;
+            border: 2px solid #000000;
+            margin: 15px auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .screenshot-image {
             max-width: 100%;
             height: auto;
             border: 2px solid #000000;
             border-radius: 12px;
-            margin: 15px auto;
-            display: block;
+            margin: 15px 0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
@@ -313,6 +329,7 @@
             font-family: 'Courier New', monospace;
             font-size: 1.2em;
             font-weight: 700;
+            position: relative;
         }
 
         .copy-btn {
@@ -335,6 +352,19 @@
         .copy-btn:active {
             background: #000000;
             transform: scale(0.95);
+        }
+
+        .image-fallback {
+            margin: 15px 0;
+        }
+
+        .image-loading {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            background: #f8f9fa;
+            color: #666;
         }
 
         /* スマートフォン対応 */
@@ -418,26 +448,29 @@
     </div>
 
     <script>
-        // GitHub Pages対応画像URL（相対パス）
+        // 修正済み画像URL（実際のファイル名に合わせて修正）
         const imageUrls = {
-            appIcon: "./images/hrmos-icon.png",
-            loginScreen: "./images/login-screen.png"
+            appIcon: "./images/hrmos-app-icon.png",      // ← 修正済み
+            loginScreen: "./images/login-screen.png"      // ← 正確なファイル名
         };
 
-        // 画像表示機能（フォールバック付き）
-        function createImageElement(imageUrl, altText, description) {
+        // 画像表示機能（エラーハンドリング強化）
+        function createImageElement(imageUrl, altText, fallbackText, iconEmoji = "📱") {
+            console.log(`画像読み込み試行: ${imageUrl}`); // デバッグ用
+            
             return `
                 <div style="text-align: center; margin: 20px 0;">
                     <img src="${imageUrl}" 
                          alt="${altText}" 
-                         class="app-screenshot"
-                         onload="this.style.display='block'; this.nextElementSibling.style.display='none'; console.log('✅ 画像読み込み成功: ${imageUrl}');"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'; console.error('❌ 画像読み込み失敗: ${imageUrl}');">
+                         class="app-icon" 
+                         onload="console.log('画像読み込み成功: ${imageUrl}'); this.style.display='block'; this.nextElementSibling.style.display='none';"
+                         onerror="console.log('画像読み込み失敗: ${imageUrl}'); this.style.display='none'; this.nextElementSibling.style.display='block';">
                     
-                    <div style="display: none; border: 3px solid #dc3545; padding: 30px; text-align: center; border-radius: 15px; background: #f8d7da;">
-                        <div style="font-size: 3em; margin-bottom: 15px;">⚠️</div>
-                        <p style="font-size: 1.2em; font-weight: 600; color: #721c24; margin-bottom: 10px;">画像読み込みエラー</p>
-                        <p style="font-size: 0.9em; color: #856404;">GitHub Pages確認: ${imageUrl}</p>
+                    <div style="display: none; border: 3px solid #000000; padding: 30px; text-align: center; border-radius: 15px; background: #f8f9fa;">
+                        <div style="font-size: 3em; margin-bottom: 15px;">${iconEmoji}</div>
+                        <p style="font-size: 1.2em; font-weight: 600; color: #000000; margin-bottom: 10px;">${fallbackText}</p>
+                        <p style="font-size: 0.9em; color: #666;">画像読み込み中またはファイルが見つかりません</p>
+                        <p style="font-size: 0.8em; color: #666; margin-top: 10px;">URL: ${imageUrl}</p>
                     </div>
                     
                     <p style="font-size: 0.9em; color: #666; margin-top: 10px; font-weight: 600;">⬆️ ${altText}</p>
@@ -445,7 +478,7 @@
             `;
         }
 
-        // ステップ定義（2画像のみ対応）
+        // ステップ定義（5ステップ）
         const steps = [
             {
                 title: "📱 HRMOS勤怠管理アプリをダウンロード",
@@ -587,7 +620,8 @@
                     appIconHtml = createImageElement(
                         imageUrls.appIcon,
                         "HRMOSアプリのアイコン", 
-                        "HRMOSアプリのアイコン"
+                        "HRMOSアプリのアイコン",
+                        "📱"
                     );
                 }
 
@@ -609,7 +643,8 @@
                     loginScreenHtml = createImageElement(
                         imageUrls.loginScreen,
                         "ログイン画面の例",
-                        "ログイン画面"
+                        "ログイン画面",
+                        "🔐"
                     );
                 }
 
@@ -693,11 +728,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             updateProgress();
             displayStep(0);
-            
-            console.log('🚀 HRMOS導入ガイド読み込み完了 (GitHub Pages版)');
-            console.log('📁 画像フォルダ: ./images/');
-            console.log('📷 アプリアイコン:', imageUrls.appIcon);
-            console.log('🔐 ログイン画面:', imageUrls.loginScreen);
         });
 
         // スマートフォンのタッチ操作改善
