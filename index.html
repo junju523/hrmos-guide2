@@ -247,27 +247,37 @@
         .app-store-buttons {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
+            gap: 15px;
+            margin: 25px 0;
             flex-wrap: wrap;
         }
 
         .app-store-btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             background: #000000;
             color: #ffffff;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 15px 25px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
             border: 2px solid #000000;
             transition: all 0.3s ease;
+            font-size: 1.1em;
+            min-width: 160px;
+            justify-content: center;
         }
 
         .app-store-btn:hover {
             background: #ffffff;
             color: #000000;
             text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        .app-store-btn .icon {
+            margin-right: 8px;
+            font-size: 1.2em;
         }
 
         .typing-indicator {
@@ -315,7 +325,8 @@
             height: auto;
             border: 2px solid #000000;
             border-radius: 12px;
-            margin: 15px 0;
+            margin: 15px auto;
+            display: block;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
@@ -411,7 +422,8 @@
             }
 
             .app-store-btn {
-                width: 200px;
+                width: 100%;
+                max-width: 250px;
                 text-align: center;
             }
 
@@ -438,7 +450,7 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
             <div class="step-counter">
-                ステップ <span id="currentStep">1</span> / <span id="totalSteps">5</span>
+                ステップ <span id="currentStep">1</span> / <span id="totalSteps">4</span>
             </div>
         </div>
 
@@ -448,21 +460,21 @@
     </div>
 
     <script>
-        // 修正済み画像URL（実際のファイル名に合わせて修正）
+        // 画像URL（修正済み）
         const imageUrls = {
-            appIcon: "./images/hrmos-app-icon.png",      // ← 修正済み
-            loginScreen: "./images/login-screen.png"      // ← 正確なファイル名
+            appIcon: "./images/hrmos-app-icon.png",
+            loginScreen: "./images/login-screen.png"
         };
 
-        // 画像表示機能（エラーハンドリング強化）
+        // 画像表示機能（中央配置修正）
         function createImageElement(imageUrl, altText, fallbackText, iconEmoji = "📱") {
-            console.log(`画像読み込み試行: ${imageUrl}`); // デバッグ用
+            console.log(`画像読み込み試行: ${imageUrl}`);
             
             return `
                 <div style="text-align: center; margin: 20px 0;">
                     <img src="${imageUrl}" 
                          alt="${altText}" 
-                         class="app-icon" 
+                         class="screenshot-image" 
                          onload="console.log('画像読み込み成功: ${imageUrl}'); this.style.display='block'; this.nextElementSibling.style.display='none';"
                          onerror="console.log('画像読み込み失敗: ${imageUrl}'); this.style.display='none'; this.nextElementSibling.style.display='block';">
                     
@@ -470,7 +482,6 @@
                         <div style="font-size: 3em; margin-bottom: 15px;">${iconEmoji}</div>
                         <p style="font-size: 1.2em; font-weight: 600; color: #000000; margin-bottom: 10px;">${fallbackText}</p>
                         <p style="font-size: 0.9em; color: #666;">画像読み込み中またはファイルが見つかりません</p>
-                        <p style="font-size: 0.8em; color: #666; margin-top: 10px;">URL: ${imageUrl}</p>
                     </div>
                     
                     <p style="font-size: 0.9em; color: #666; margin-top: 10px; font-weight: 600;">⬆️ ${altText}</p>
@@ -478,15 +489,14 @@
             `;
         }
 
-        // ステップ定義（5ステップ）
+        // ステップ定義（4ステップに変更）
         const steps = [
             {
                 title: "📱 HRMOS勤怠管理アプリをダウンロード",
                 message: "まずはスマートフォンにHRMOS勤怠管理アプリをダウンロードしましょう。",
                 tasks: [
                     "スマートフォンでアプリストアを開く",
-                    "検索欄で「HRMOS 勤怠管理」と入力", 
-                    "HRMOS勤怠管理アプリを探す（下記参考）",
+                    "下記のリンクから直接アプリにアクセス",
                     "「インストール」または「入手」ボタンをタップ",
                     "ダウンロードが完了するまで待つ"
                 ],
@@ -499,8 +509,7 @@
                 message: "アプリをダウンロードできましたね！次はログインしましょう。",
                 tasks: [
                     "ホーム画面からHRMOS勤怠管理アプリをタップ",
-                    "「会社URL」の欄に下記URLを入力",
-                    "「ログイン」ボタンをタップ", 
+                    "「会社URL」の欄に下記URLを貼り付けし「次へ」をタップ",
                     "会社から配布されたIDとパスワードを入力",
                     "「ログイン」をタップして完了"
                 ],
@@ -518,19 +527,6 @@
                     "異常や修正が必要な箇所をメモする"
                 ],
                 info: "💡 打刻漏れや時間のずれがないか、毎日確認する習慣をつけましょう。"
-            },
-            {
-                title: "📞 修正点をLINEWORKSで報告",
-                message: "勤怠データに修正が必要な場合は、LINEWORKSで報告しましょう。",
-                tasks: [
-                    "修正が必要な項目を具体的にメモする",
-                    "LINEWORKSアプリを開く",
-                    "管理者またはHRMOS担当者にメッセージを送る",
-                    "「日付・修正内容・理由」を明確に記載して送信",
-                    "対応完了の返信を待つ"
-                ],
-                info: "💡 修正依頼は具体的に記載することで、スムーズに対応してもらえます。",
-                reportExample: "【修正依頼例】\n7月15日の退勤時間を18:30→18:00に修正お願いします。\n理由：残業なしのため実際は18:00に退勤しました。"
             },
             {
                 title: "🎉 導入完了",
@@ -606,10 +602,10 @@
                     appStoreHtml = `
                         <div class="app-store-buttons">
                             <a href="https://apps.apple.com/jp/app/hrmos%E5%8B%A4%E6%80%A0/id1543163814" target="_blank" class="app-store-btn">
-                                🍎 App Store
+                                <span class="icon">🍎</span>iPhoneの方はこちら
                             </a>
                             <a href="https://play.google.com/store/apps/details?id=jp.co.bizreach.hrmos.kintai" target="_blank" class="app-store-btn">
-                                🤖 Google Play
+                                <span class="icon">🤖</span>Androidの方はこちら
                             </a>
                         </div>
                     `;
@@ -646,16 +642,6 @@
                         "ログイン画面",
                         "🔐"
                     );
-                }
-
-                let reportExampleHtml = '';
-                if (step.reportExample) {
-                    reportExampleHtml = `
-                        <div class="info-box">
-                            <strong>📝 報告例：</strong><br><br>
-                            <pre style="font-family: inherit; white-space: pre-wrap; margin: 0;">${step.reportExample}</pre>
-                        </div>
-                    `;
                 }
                 
                 if (step.success) {
@@ -701,7 +687,6 @@
                         </ul>
                         ${loginScreenHtml}
                         ${appStoreHtml}
-                        ${reportExampleHtml}
                         <button class="completed-btn" onclick="nextStep()">
                             ✅ このステップを完了しました
                         </button>
