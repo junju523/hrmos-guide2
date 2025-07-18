@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRMOS勤怠管理アプリ導入ガイド</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 10px;
+            line-height: 1.6;
+            color: #000000;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 2px solid #000000;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #000000;
+            color: #ffffff;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.95;
+        }
+
+        .progress-container {
+            background: #ffffff;
+            padding: 20px;
+            border-bottom: 2px solid #000000;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #000000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000000;
+            width: 0%;
+            transition: width 0.8s ease;
+            border-radius: 4px;
+        }
+
+        .step-counter {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1em;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .chat-container {
+            padding: 20px;
+            min-height: 400px;
+            background: #ffffff;
+        }
+
+        .message {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            animation: slideIn 0.6s ease;
+            background: #ffffff;
+            border: 2px solid #000000;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-message {
+            background: #f8f9fa;
+            color: #000000;
+            margin-left: 20px;
+            border: 2px solid #000000;
+        }
+
+        .ai-avatar {
+            position: absolute;
+            left: -35px;
+            top: 15px;
+            width: 30px;
+            height: 30px;
+            background: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: #ffffff;
+        }
+
+        .task-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .task-icon {
+            margin-right: 12px;
+            font-size: 1.6em;
+        }
+
+        .task-steps {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .task-steps li {
+            padding: 15px 0;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: flex-start;
+            color: #495057;
+            font-size: 1em;
+        }
+
+        .task-steps li:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            background: #000000;
+            color: #ffffff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 0.9em;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .completed-btn {
+            background: #000000;
+            color: #ffffff;
+            border: 2px solid #000000;
+            padding: 18px 30px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 25px auto 10px;
+            width: 100%;
+        }
+
+        .completed-btn:hover {
+            background: #ffffff;
+            color: #000000;
+            transform: translateY(-2px);
+        }
+
+        .completed-btn:active {
+            transform: translateY(0);
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #0c5460;
+            font-weight: 500;
+        }
+
+        .success-animation {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 4em;
+            animation: bounce 2s infinite;
+            color: #000000;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-8px); }
+        }
+
+        .app-store-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .app-store-btn {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid #000000;
+            transition: all 0.3s ease;
+        }
+
+        .app-store-btn:hover {
+            background: #ffffff;
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .typing-dots {
+            display: flex;
+            margin-left: 15px;
+        }
+
+        .typing-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #000000;
+            margin: 0 3px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .app-screenshot {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #000000;
+            border-radius: 12px;
+            margin: 15px auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .url-box {
+            background: #ffffff;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .copy-btn {
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #333333;
+        }
+
+        .copy-btn:active {
+            background: #000000;
+            transform: scale(0.95);
+        }
+
+        /* スマートフォン対応 */
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+                border-left: none;
+                border-right: none;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .chat-container {
+                padding: 15px;
+            }
+
+            .message {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .task-steps li {
+                padding: 12px 0;
+                font-size: 0.95em;
+            }
+
+            .step-number {
+                width: 25px;
+                height: 25px;
+                font-size: 0.8em;
+            }
+
+            .app-store-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .app-store-btn {
+                width: 200px;
+                text-align: center;
+            }
+
+            .url-box {
+                font-size: 1.1em;
+                padding: 15px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 HRMOS勤怠管理アプリ</h1>
+            <p>丸三老舗スタッフ向け導入ガイド</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="step-counter">
+                ステップ <span id="currentStep">1</span> / <span id="totalSteps">5</span>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <!-- メッセージがここに動的に追加されます -->
+        </div>
+    </div>
+
+    <script>
+        // GitHub Pages対応画像URL（相対パス）
+        const imageUrls = {
+            appIcon: "./images/hrmos-icon.png",
+            loginScreen: "./images/login-screen.png"
+        };
+
+        // 画像表示機能（フォールバック付き）
+        function createImageElement(imageUrl, altText, description) {
+            return `
+                <div style="text-align: center; margin: 20px 0;">
+                    <img src="${imageUrl}" 
+                         alt="${altText}" 
+                         class="app-screenshot"
+                         onload="this.style.display='block'; this.nextElementSibling.style.display='none'; console.log('✅ 画像読み込み成功: ${imageUrl}');"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'; console.error('❌ 画像読み込み失敗: ${imageUrl}');">
+                    
+                    <div style="display: none; border: 3px solid #dc3545; padding: 30px; text-align: center; border-radius: 15px; background: #f8d7da;">
+                        <div style="font-size: 3em; margin-bottom: 15px;">⚠️</div>
+                        <p style="font-size: 1.2em; font-weight: 600; color: #721c24; margin-bottom: 10px;">画像読み込みエラー</p>
+                        <p style="font-size: 0.9em; color: #856404;">GitHub Pages確認: ${imageUrl}</p>
+                    </div>
+                    
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px; font-weight: 600;">⬆️ ${altText}</p>
+                </div>
+            `;
+        }
+
+        // ステップ定義（2画像のみ対応）
+        const steps = [
+            {
+                title: "📱 HRMOS勤怠管理アプリをダウンロード",
+                message: "まずはスマートフォンにHRMOS勤怠管理アプリをダウンロードしましょう。",
+                tasks: [
+                    "スマートフォンでアプリストアを開く",
+                    "検索欄で「HRMOS 勤怠管理」と入力", 
+                    "HRMOS勤怠管理アプリを探す（下記参考）",
+                    "「インストール」または「入手」ボタンをタップ",
+                    "ダウンロードが完了するまで待つ"
+                ],
+                info: "💡 アプリは無料でダウンロードできます。WiFi環境でのダウンロードを推奨します。",
+                appStores: true,
+                showAppIcon: true
+            },
+            {
+                title: "🔐 アプリにログイン",
+                message: "アプリをダウンロードできましたね！次はログインしましょう。",
+                tasks: [
+                    "ホーム画面からHRMOS勤怠管理アプリをタップ",
+                    "「会社URL」の欄に下記URLを入力",
+                    "「ログイン」ボタンをタップ", 
+                    "会社から配布されたIDとパスワードを入力",
+                    "「ログイン」をタップして完了"
+                ],
+                companyUrl: "ieyasu.co/maru_kin",
+                showLoginScreen: true,
+                warning: "⚠️ IDとパスワードは会社から配布されたものを使用してください。不明な場合は管理者に確認してください。"
+            },
+            {
+                title: "📋 日次勤怠を確認",
+                message: "ログインできました！日次勤怠データを確認してみましょう。",
+                tasks: [
+                    "ホーム画面から「日次勤怠」をタップ",
+                    "確認したい日付を選択", 
+                    "出勤時間、退勤時間、休憩時間が正しく記録されているか確認",
+                    "異常や修正が必要な箇所をメモする"
+                ],
+                info: "💡 打刻漏れや時間のずれがないか、毎日確認する習慣をつけましょう。"
+            },
+            {
+                title: "📞 修正点をLINEWORKSで報告",
+                message: "勤怠データに修正が必要な場合は、LINEWORKSで報告しましょう。",
+                tasks: [
+                    "修正が必要な項目を具体的にメモする",
+                    "LINEWORKSアプリを開く",
+                    "管理者またはHRMOS担当者にメッセージを送る",
+                    "「日付・修正内容・理由」を明確に記載して送信",
+                    "対応完了の返信を待つ"
+                ],
+                info: "💡 修正依頼は具体的に記載することで、スムーズに対応してもらえます。",
+                reportExample: "【修正依頼例】\n7月15日の退勤時間を18:30→18:00に修正お願いします。\n理由：残業なしのため実際は18:00に退勤しました。"
+            },
+            {
+                title: "🎉 導入完了",
+                message: "お疲れさまでした！HRMOS勤怠管理アプリの使い方をマスターしました。",
+                tasks: [
+                    "日々の勤怠確認を習慣化する",
+                    "修正が必要な場合は適切に報告する",
+                    "不明点があれば遠慮なく質問する"
+                ],
+                success: true
+            }
+        ];
+
+        let currentStepIndex = 0;
+        const totalSteps = steps.length;
+
+        function updateProgress() {
+            const progress = ((currentStepIndex + 1) / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentStep').textContent = currentStepIndex + 1;
+            document.getElementById('totalSteps').textContent = totalSteps;
+        }
+
+        function showTypingIndicator() {
+            const chatContainer = document.getElementById('chatContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = `
+                🤖 AIが説明を準備中
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return typingDiv;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ コピー完了';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#000000';
+                }, 2000);
+            }, function(err) {
+                alert('コピーに失敗しました: ' + err);
+            });
+        }
+
+        function displayStep(stepIndex) {
+            const step = steps[stepIndex];
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // タイピング表示
+            const typingIndicator = showTypingIndicator();
+            
+            setTimeout(() => {
+                // タイピング表示を削除
+                typingIndicator.remove();
+                
+                // メッセージ表示
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ai-message';
+                
+                let appStoreHtml = '';
+                if (step.appStores) {
+                    appStoreHtml = `
+                        <div class="app-store-buttons">
+                            <a href="https://apps.apple.com/jp/app/hrmos%E5%8B%A4%E6%80%A0/id1543163814" target="_blank" class="app-store-btn">
+                                🍎 App Store
+                            </a>
+                            <a href="https://play.google.com/store/apps/details?id=jp.co.bizreach.hrmos.kintai" target="_blank" class="app-store-btn">
+                                🤖 Google Play
+                            </a>
+                        </div>
+                    `;
+                }
+
+                let appIconHtml = '';
+                if (step.showAppIcon) {
+                    appIconHtml = createImageElement(
+                        imageUrls.appIcon,
+                        "HRMOSアプリのアイコン", 
+                        "HRMOSアプリのアイコン"
+                    );
+                }
+
+                let companyUrlHtml = '';
+                if (step.companyUrl) {
+                    companyUrlHtml = `
+                        <div class="url-box">
+                            <strong>📋 会社URL</strong><br><br>
+                            <div style="font-size: 1.3em; color: #007bff; margin: 10px 0;">${step.companyUrl}</div>
+                            <button class="copy-btn" onclick="copyToClipboard('${step.companyUrl}')">
+                                📋 URLをコピー
+                            </button>
+                        </div>
+                    `;
+                }
+
+                let loginScreenHtml = '';
+                if (step.showLoginScreen) {
+                    loginScreenHtml = createImageElement(
+                        imageUrls.loginScreen,
+                        "ログイン画面の例",
+                        "ログイン画面"
+                    );
+                }
+
+                let reportExampleHtml = '';
+                if (step.reportExample) {
+                    reportExampleHtml = `
+                        <div class="info-box">
+                            <strong>📝 報告例：</strong><br><br>
+                            <pre style="font-family: inherit; white-space: pre-wrap; margin: 0;">${step.reportExample}</pre>
+                        </div>
+                    `;
+                }
+                
+                if (step.success) {
+                    messageDiv.innerHTML = `
+                        <div class="ai-avatar">🤖</div>
+                        <div class="success-animation">
+                            <div class="success-icon">🎉</div>
+                            <h2 style="color: #000000; margin: 20px 0;">完了しました！</h2>
+                            <p style="color: #000000; font-size: 1.1em; line-height: 1.8;">
+                                HRMOS勤怠管理アプリの導入が完了しました！<br><br>
+                                これで日々の勤怠管理がスムーズにできるようになりますね。<br><br>
+                                困ったことがあればいつでもLINEWORKSで質問してください。
+                            </p>
+                            <div style="margin-top: 30px; padding: 20px; background: #d4edda; border: 2px solid #28a745; border-radius: 10px;">
+                                <strong style="color: #155724;">📋 今後の流れ：</strong><br><br>
+                                <ul style="color: #155724; text-align: left; margin: 10px 0; padding-left: 20px;">
+                                    <li>毎日アプリで勤怠データを確認</li>
+                                    <li>修正があればLINEWORKSで報告</li>
+                                    <li>不明点は遠慮なく質問</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    messageDiv.innerHTML = `
+                        <div class="ai-avatar">🤖</div>
+                        <div class="task-title">
+                            <span class="task-icon">${step.title.split(' ')[0]}</span>
+                            ${step.title.split(' ').slice(1).join(' ')}
+                        </div>
+                        <p style="color: #000000; margin-bottom: 15px; font-size: 1.05em;">${step.message}</p>
+                        ${step.warning ? `<div class="warning-box">${step.warning}</div>` : ''}
+                        ${step.info ? `<div class="info-box">${step.info}</div>` : ''}
+                        ${appIconHtml}
+                        ${companyUrlHtml}
+                        <ul class="task-steps">
+                            ${step.tasks.map((task, index) => 
+                                `<li>
+                                    <span class="step-number">${index + 1}</span>
+                                    <span class="step-text">${task}</span>
+                                </li>`
+                            ).join('')}
+                        </ul>
+                        ${loginScreenHtml}
+                        ${appStoreHtml}
+                        ${reportExampleHtml}
+                        <button class="completed-btn" onclick="nextStep()">
+                            ✅ このステップを完了しました
+                        </button>
+                    `;
+                }
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 1200);
+        }
+
+        function nextStep() {
+            currentStepIndex++;
+            updateProgress();
+            
+            if (currentStepIndex < totalSteps) {
+                setTimeout(() => {
+                    displayStep(currentStepIndex);
+                }, 300);
+            }
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            displayStep(0);
+            
+            console.log('🚀 HRMOS導入ガイド読み込み完了 (GitHub Pages版)');
+            console.log('📁 画像フォルダ: ./images/');
+            console.log('📷 アプリアイコン:', imageUrls.appIcon);
+            console.log('🔐 ログイン画面:', imageUrls.loginScreen);
+        });
+
+        // スマートフォンのタッチ操作改善
+        document.addEventListener('touchstart', function() {}, { passive: true });
+    </script>
+</body>
+</html>
